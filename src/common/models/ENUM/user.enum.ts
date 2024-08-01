@@ -3,3 +3,9 @@ export enum UserEnum {
   ADMIN_USER = 'ADMIN',
   OPERATIONAL_USER = 'OPERATIONAL',
 }
+
+export enum Status {
+  CONFIRMED = 'confirmed',
+  PENDING = 'pending',
+  CANCELLED = 'cancelled',
+}
