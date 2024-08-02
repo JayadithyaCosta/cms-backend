@@ -11,24 +11,26 @@ import { Request, Response } from 'express';
 export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-
+    const response = ctx.getResponse<Response>();
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : 'Internal server error';
-
-    response.status(status).json({
+    const errorResponse = {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      message,
-    });
+      message:
+        exception instanceof HttpException
+          ? exception.getResponse()
+          : exception,
+    };
+
+    // Log the error in red color
+    console.error('\x1b[31m', errorResponse, '\x1b[0m');
+
+    response.status(status).json(errorResponse);
   }
 }
