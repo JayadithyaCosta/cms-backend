@@ -1,7 +1,7 @@
 export enum UserEnum {
-  DEFAULT_USER = 'USER',
-  ADMIN_USER = 'ADMIN',
-  OPERATIONAL_USER = 'OPERATIONAL',
+  DEFAULT_USER = 'User',
+  ADMIN_USER = 'Admin',
+  OPERATIONAL_USER = 'Operational',
 }
 
 export enum Status {
