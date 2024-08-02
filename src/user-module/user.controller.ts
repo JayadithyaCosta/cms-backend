@@ -12,6 +12,7 @@ import { JwtAuthGuard } from '../auth-module/jwt-auth.guard';
 import { GetUser } from '../auth-module/get-user.decorator';
 import { User } from './schemas/user.schema'; // Import your User schema
 import { CreateUserDto, LoginUserDto } from './dto/create-user.dto';
+import { CreateReservationDto } from './dto/create-reservation.dto';
 
 @Controller('users')
 export class UserController {
@@ -50,5 +51,14 @@ export class UserController {
     }
 
     return { token: await this.userService.generateJwt(user) }; // Use generateJwt from UserService
+  }
+
+  @Post('create-reservation')
+  @UseGuards(JwtAuthGuard)
+  async createReservation(
+    @Body() reservation: CreateReservationDto,
+    @GetUser() user: User,
+  ): Promise<{ message: string; reservationId: string }> {
+    return this.userService.createReservation(reservation, user);
   }
 }

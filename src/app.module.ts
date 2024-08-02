@@ -5,6 +5,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth-module/auth.module';
+import { AdminModule } from './admin-module/admin.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AuthModule } from './auth-module/auth.module';
     MongooseModule.forRoot(process.env.DATABASE_URL), // Ensure DATABASE_URL is set
     UserModule,
     AuthModule,
+    AdminModule,
   ],
   providers: [
     {

@@ -12,11 +12,15 @@ import { User } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt'; // Import JwtService
+import { CreateReservationDto } from './dto/create-reservation.dto';
+import { Reservation } from './schemas/reservations.schema';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(Reservation.name) private reservationModel: Model<Reservation>,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private jwtService: JwtService, // Inject JwtService
   ) {}
@@ -105,6 +109,41 @@ export class UserService {
     } catch (error) {
       console.error('Error generating JWT:', error);
       throw new InternalServerErrorException('Error generating JWT');
+    }
+  }
+
+  async createReservation(
+    reservation: CreateReservationDto,
+    user: User,
+  ): Promise<{ message: string; reservationId: string }> {
+    try {
+      const reservationId = uuidv4();
+
+      const newReservation = new this.reservationModel({
+        reservationId,
+        userId: user._id.toString(),
+        details: {
+          ...reservation.reservationDetails,
+          status: 'PENDING',
+          quantity:
+            reservation.reservationDetails.quantity === undefined
+              ? 1
+              : reservation.reservationDetails.quantity,
+        },
+        agentId: null,
+        bookedDate: reservation.reservationDetails.bookedDate
+          ? new Date(reservation.reservationDetails.bookedDate)
+          : new Date(),
+      });
+      try {
+        await newReservation.save();
+        return { message: 'Reservation created successfully', reservationId };
+      } catch (saveError) {
+        console.error('Error saving reservation:', saveError);
+        throw new InternalServerErrorException('Error saving reservation');
+      }
+    } catch (error) {
+      throw new InternalServerErrorException('Error creating reservation');
     }
   }
 }

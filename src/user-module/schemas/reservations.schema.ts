@@ -7,16 +7,19 @@ export class Reservation extends Document {
   @Prop({ required: true })
   userId: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Object })
   details: ReservationDetails;
 
-  @Prop({ required: true, default: false })
+  @Prop({ required: false, default: null })
   agentId?: string;
 
-  @Prop({ required: true, default: new Date() })
+  @Prop({ required: true, default: false })
+  bookedDate: Date;
+
+  @Prop({ required: false, default: new Date() })
   createdAt: Date;
 
-  @Prop({ required: true, default: new Date() })
+  @Prop({ required: false, default: new Date() })
   updatedAt: Date;
 }
 

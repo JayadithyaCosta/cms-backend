@@ -6,10 +6,14 @@ import { UserController } from './user.controller';
 import { User, UserSchema } from './schemas/user.schema';
 import { redisStore } from 'cache-manager-ioredis'; // Ensure correct import
 import { AuthModule } from '../auth-module/auth.module'; // Correct path
+import { Reservation, ReservationSchema } from './schemas/reservations.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: Reservation.name, schema: ReservationSchema },
+    ]),
     CacheModule.registerAsync({
       useFactory: async () => ({
         store: redisStore, // Correct use of redisStore
