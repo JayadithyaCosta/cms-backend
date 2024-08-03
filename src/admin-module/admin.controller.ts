@@ -57,7 +57,9 @@ export default class AdminController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(RolesInterceptor)
   @Roles(UserEnum.ADMIN_USER)
-  async deleteReservation(@Query('reservationId') reservationId: string) {
+  async deleteReservation(
+    @Query('reservationId') reservationId: string,
+  ): Promise<BaseResponseDto> {
     return this.adminService.deleteReservation(reservationId);
   }
 

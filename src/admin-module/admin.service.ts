@@ -67,8 +67,13 @@ export class AdminService {
     };
   }
 
-  async deleteReservation(reservationId: string) {
-    return this.reservationmodel.findByIdAndDelete(reservationId).exec();
+  async deleteReservation(reservationId: string): Promise<BaseResponseDto> {
+    const reservationObjectId = new ObjectId(reservationId);
+    await this.reservationmodel.findByIdAndDelete(reservationObjectId).exec();
+    return {
+      success: true,
+      message: 'Reservation deleted successfully',
+    };
   }
 
   async createAdminUser(
