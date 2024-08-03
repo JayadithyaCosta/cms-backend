@@ -1,6 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { ReservationDetails } from 'src/common/models/types/reservations.type';
+import {
+  ReservationDetails,
+  ReservationModelAdminUserInfo,
+} from 'src/common/models/types/reservations.type';
 
 @Schema()
 export class Reservation extends Document {
@@ -13,8 +16,8 @@ export class Reservation extends Document {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: false, default: null })
-  agentId?: string;
+  @Prop({ required: false, default: null, type: Object })
+  adminInfo?: ReservationModelAdminUserInfo;
 
   @Prop({ required: true, default: false })
   bookedDate: Date;

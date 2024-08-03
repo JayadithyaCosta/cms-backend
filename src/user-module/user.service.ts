@@ -15,7 +15,6 @@ import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { Reservation } from './schemas/reservations.schema';
-import { v4 as uuidv4 } from 'uuid';
 import { Status } from 'src/common/models/ENUM/user.enum';
 
 @Injectable()
@@ -125,10 +124,7 @@ export class UserService {
     user: User,
   ): Promise<{ message: string; reservationId: string }> {
     try {
-      const reservationId = uuidv4();
-
       const newReservation = new this.reservationModel({
-        reservationId,
         userId: user._id.toString(),
         email: user.email,
         details: {
@@ -146,7 +142,11 @@ export class UserService {
       });
       try {
         await newReservation.save();
-        return { message: 'Reservation created successfully', reservationId };
+
+        return {
+          message: 'Reservation created successfully',
+          reservationId: newReservation._id.toString(),
+        };
       } catch (saveError) {
         console.error('Error saving reservation:', saveError);
         throw new InternalServerErrorException('Error saving reservation');

@@ -10,6 +10,8 @@ import {
 import { UserService } from 'src/user-module/user.service';
 import { UserEnum } from 'src/common/models/ENUM/user.enum';
 import * as argon2 from 'argon2';
+import { ObjectId } from 'mongodb';
+import { BaseResponseDto } from './dto/response/base.response.dto';
 
 @Injectable()
 export class AdminService {
@@ -37,11 +39,32 @@ export class AdminService {
     return this.reservationmodel.find().exec();
   }
 
-  async updateReservation(updateReservationDto: UpdateReservationDto) {
+  async updateReservation(
+    updateReservationDto: UpdateReservationDto,
+    user: User,
+  ): Promise<BaseResponseDto> {
     const { reservationId, status } = updateReservationDto;
-    return this.reservationmodel
-      .findByIdAndUpdate(reservationId, { status })
+    const reservationObjectId = new ObjectId(reservationId);
+
+    await this.reservationmodel
+      .findOneAndUpdate(
+        { _id: reservationObjectId },
+        {
+          'details.status': status,
+          adminInfo: {
+            username: user.name,
+            userId: user._id,
+          },
+          updatedAt: new Date(),
+        },
+        { new: true },
+      )
       .exec();
+
+    return {
+      success: true,
+      message: 'Reservation updated successfully',
+    };
   }
 
   async deleteReservation(reservationId: string) {

@@ -22,8 +22,6 @@ export class RolesInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    console.log('REQuest User::', user);
-
     // Extract role from _doc if not directly available on user object
     const userRole = user.role || (user._doc && user._doc.role);
 

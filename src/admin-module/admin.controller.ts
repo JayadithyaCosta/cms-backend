@@ -19,6 +19,8 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserEnum } from 'src/common/models/ENUM/user.enum';
 import { User } from 'src/user-module/schemas/user.schema';
 import { Reservation } from 'src/user-module/schemas/reservations.schema';
+import { BaseResponseDto } from './dto/response/base.response.dto';
+import { GetUser } from 'src/auth-module/get-user.decorator';
 
 @Controller('admin')
 export default class AdminController {
@@ -44,8 +46,11 @@ export default class AdminController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(RolesInterceptor)
   @Roles(UserEnum.ADMIN_USER)
-  async updateReservation(@Body() updateReservationDto: UpdateReservationDto) {
-    return this.adminService.updateReservation(updateReservationDto);
+  async updateReservation(
+    @Body() updateReservationDto: UpdateReservationDto,
+    @GetUser() user: User,
+  ): Promise<BaseResponseDto> {
+    return this.adminService.updateReservation(updateReservationDto, user);
   }
 
   @Delete('delete-reservation')
