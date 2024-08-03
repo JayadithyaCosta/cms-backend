@@ -39,8 +39,6 @@ export class UserController {
       throw new UnauthorizedException('User not found');
     }
 
-    console.log('User:', user);
-
     const isPasswordValid = await this.userService.verifyPassword(
       loginUserDto.password,
       user.password,

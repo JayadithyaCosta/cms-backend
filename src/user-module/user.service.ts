@@ -3,6 +3,7 @@ import {
   Inject,
   InternalServerErrorException,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
@@ -11,10 +12,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as argon2 from 'argon2';
-import { JwtService } from '@nestjs/jwt'; // Import JwtService
+import { JwtService } from '@nestjs/jwt';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { Reservation } from './schemas/reservations.schema';
 import { v4 as uuidv4 } from 'uuid';
+import { Status } from 'src/common/models/ENUM/user.enum';
 
 @Injectable()
 export class UserService {
@@ -61,8 +63,9 @@ export class UserService {
 
     try {
       const user = await this.userModel.findOne({ email: email }).exec();
-      if (!user) {
-        throw new NotFoundException('User not found');
+
+      if (!user || user === null) {
+        return null;
       }
 
       // Cache the user data with a TTL of 60 seconds
@@ -75,6 +78,11 @@ export class UserService {
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<{ token: string }> {
+    const emailExists = await this.findByEmail(createUserDto.email);
+
+    if (emailExists) {
+      throw new ForbiddenException('Email already exists');
+    }
     const hashedPassword = await argon2.hash(createUserDto.password);
     const createdUser = new this.userModel({
       ...createUserDto,
@@ -122,9 +130,10 @@ export class UserService {
       const newReservation = new this.reservationModel({
         reservationId,
         userId: user._id.toString(),
+        email: user.email,
         details: {
           ...reservation.reservationDetails,
-          status: 'PENDING',
+          status: Status.PENDING,
           quantity:
             reservation.reservationDetails.quantity === undefined
               ? 1

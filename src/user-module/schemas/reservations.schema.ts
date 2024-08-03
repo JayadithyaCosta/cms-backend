@@ -10,6 +10,9 @@ export class Reservation extends Document {
   @Prop({ required: true, type: Object })
   details: ReservationDetails;
 
+  @Prop({ required: true, unique: true })
+  email: string;
+
   @Prop({ required: false, default: null })
   agentId?: string;
 

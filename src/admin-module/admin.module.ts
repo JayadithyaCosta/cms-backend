@@ -9,6 +9,7 @@ import {
 } from 'src/user-module/schemas/reservations.schema';
 import AdminController from './admin.controller';
 import { AdminService } from './admin.service';
+import { UserModule } from 'src/user-module/user.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AdminService } from './admin.service';
         ttl: 60, // seconds
       }),
     }),
+    UserModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],
