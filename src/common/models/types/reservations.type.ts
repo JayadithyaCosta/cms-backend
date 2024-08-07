@@ -5,7 +5,7 @@ export type ReservationDetails = {
   quantity?: number;
   status?: Status;
   specialRequests?: string;
-  tablenumber: number;
+  tablenumber?: number;
 };
 
 export type ReservationModelAdminUserInfo = {

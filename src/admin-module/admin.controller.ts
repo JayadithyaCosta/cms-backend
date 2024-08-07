@@ -12,6 +12,7 @@ import { AdminService } from './admin.service';
 import {
   CreateAdminUserDto,
   UpdateReservationDto,
+  UpdateUserDto,
 } from './dto/response/create-actions-admin-user.dto';
 import { JwtAuthGuard } from 'src/auth-module/jwt-auth.guard';
 import { RolesInterceptor } from 'src/common/interceptors/role.interceptor';
@@ -32,6 +33,24 @@ export default class AdminController {
   @Roles(UserEnum.ADMIN_USER)
   async getAllUsers(): Promise<User[]> {
     return this.adminService.getAllUsers();
+  }
+
+  @Post('update-user')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(RolesInterceptor)
+  @Roles(UserEnum.ADMIN_USER)
+  async updateUser(
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<BaseResponseDto> {
+    return this.adminService.updateUser(updateUserDto);
+  }
+
+  @Delete('delete-user')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(RolesInterceptor)
+  @Roles(UserEnum.ADMIN_USER)
+  async deleteUser(@Query('userId') userId: string): Promise<BaseResponseDto> {
+    return this.adminService.deleteUser(userId);
   }
 
   @Get('get-all-reservations')

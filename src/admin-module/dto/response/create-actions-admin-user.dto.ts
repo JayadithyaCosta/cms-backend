@@ -10,3 +10,9 @@ export class CreateAdminUserDto {
   email: string;
   password: string;
 }
+
+export class UpdateUserDto {
+  userId: string;
+  name: string;
+  email: string;
+}

@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   ForbiddenException,
+  ConflictException,
 } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
@@ -124,6 +125,23 @@ export class UserService {
     user: User,
   ): Promise<{ message: string; reservationId: string }> {
     try {
+      // Check if a reservation with the same email already exists
+      const existingReservation = await this.reservationModel.findOne({
+        email: user.email,
+      });
+
+      if (existingReservation) {
+        throw new ConflictException(
+          'A reservation with this email already exists.',
+        );
+        // Alternatively, update the existing reservation
+        // return await this.updateReservation(
+        //   existingReservation._id,
+        //   reservation,
+        //   user,
+        // );
+      }
+
       const newReservation = new this.reservationModel({
         userId: user._id.toString(),
         email: user.email,
@@ -140,6 +158,7 @@ export class UserService {
           ? new Date(reservation.reservationDetails.bookedDate)
           : new Date(),
       });
+
       try {
         await newReservation.save();
 
@@ -152,6 +171,9 @@ export class UserService {
         throw new InternalServerErrorException('Error saving reservation');
       }
     } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error; // Handle conflict exceptions
+      }
       throw new InternalServerErrorException('Error creating reservation');
     }
   }

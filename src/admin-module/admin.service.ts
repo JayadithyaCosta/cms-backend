@@ -6,6 +6,7 @@ import { User } from 'src/user-module/schemas/user.schema';
 import {
   CreateAdminUserDto,
   UpdateReservationDto,
+  UpdateUserDto,
 } from './dto/response/create-actions-admin-user.dto';
 import { UserService } from 'src/user-module/user.service';
 import { UserEnum } from 'src/common/models/ENUM/user.enum';
@@ -28,11 +29,35 @@ export class AdminService {
     const sanitizedUsers = users.map((user) => {
       const userObj = user.toObject();
       delete userObj.password;
-      delete userObj.createdAt;
       delete userObj.updatedAt;
       return userObj;
     });
     return sanitizedUsers;
+  }
+
+  async updateUser(updateUserDto: UpdateUserDto): Promise<BaseResponseDto> {
+    const { userId, name, email } = updateUserDto;
+    const userObjectId = new ObjectId(userId);
+    await this.userModel
+      .findOneAndUpdate(
+        { _id: userObjectId },
+        { name, email, updatedAt: new Date() },
+        { new: true },
+      )
+      .exec();
+    return {
+      success: true,
+      message: 'User updated successfully',
+    };
+  }
+
+  async deleteUser(userId: string): Promise<BaseResponseDto> {
+    const userObjectId = new ObjectId(userId);
+    await this.userModel.findByIdAndDelete(userObjectId).exec();
+    return {
+      success: true,
+      message: 'User deleted successfully',
+    };
   }
 
   async getAllReservations(): Promise<Reservation[]> {
